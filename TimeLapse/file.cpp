@@ -3,6 +3,11 @@
 
 bool writeFile(const char *path, const unsigned char *data, unsigned long len)
 {
+	// Apparently these lines will stop the flashing led during file save:
+	pinMode(33, OUTPUT);
+	digitalWrite(33, 1);
+  	digitalWrite(33, 0);
+	
 	Serial.printf("Writing file: %s\n", path);
 	File file = SD_MMC.open(path, FILE_WRITE);
 	if (!file)
@@ -48,7 +53,8 @@ bool appendFile(const char *path, const unsigned char *data, unsigned long len)
 
 bool initFileSystem()
 {
-	if (!SD_MMC.begin())
+	// if(!SD_MMC.begin()) { // fast 4bit mode
+	if (!SD_MMC.begin("/sdcard", true)) // slow 1bit mode (for two more IOs free --allows flash control?)
 	{
 		Serial.println("Card Mount Failed");
 		return false;
